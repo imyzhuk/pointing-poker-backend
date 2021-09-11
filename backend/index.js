@@ -1,6 +1,5 @@
 const express = require("express");
 const mongoose = require("mongoose");
-const bodyParser = require("body-parser");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const { v4: uuidv4 } = require("uuid");
@@ -11,8 +10,8 @@ const port = process.env.PORT || 3001;
 const oneHourInSeconds = 3600;
 
 app.use(cookieParser("secret key"));
-app.use(bodyParser.json({ limit: "50mb" }));
-app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ limit: "50mb", extended: true }));
 app.use(cors());
 
 app.post("/api/games", async (req, res) => {
