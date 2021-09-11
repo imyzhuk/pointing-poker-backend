@@ -8,6 +8,7 @@ const Game = require("./game");
 
 const app = express();
 const port = process.env.PORT || 3001;
+const oneHourInSeconds = 3600;
 
 app.use(cookieParser("secret key"));
 app.use(bodyParser.json({ limit: "50mb" }));
@@ -28,10 +29,10 @@ app.post("/api/games", async (req, res) => {
     });
     await game.save();
     res.cookie("gameId", gameId, {
-      maxAge: 3600 * 2,
+      maxAge: oneHourInSeconds * 2,
     });
     res.cookie("userId", userId, {
-      maxAge: 3600 * 2,
+      maxAge: oneHourInSeconds * 2,
     });
 
     res.sendStatus(200);
@@ -46,7 +47,7 @@ app.get("/api/games/:id", async (req, res) => {
     console.log(game);
     if (game) {
       res.cookie("gameId", game.id, {
-        maxAge: 3600 * 2,
+        maxAge: oneHourInSeconds * 2,
       });
       res.send(game);
     } else {
