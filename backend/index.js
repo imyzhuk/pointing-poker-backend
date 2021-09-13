@@ -1,22 +1,19 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
-const cookieParser = require("cookie-parser");
 const { v4: uuidv4 } = require("uuid");
 const Game = require("./game");
 
 const app = express();
 const port = process.env.PORT || 3001;
-const oneHourInSeconds = 3600;
 
-app.use(cookieParser("secret key"));
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
 app.use(cors());
 
 app.post("/api/games", async (req, res) => {
   try {
-    const owner = req.body.owner;
+    const { owner } = req.body;
     const userId = uuidv4();
     const gameId = uuidv4();
     const game = await new Game({
@@ -27,39 +24,24 @@ app.post("/api/games", async (req, res) => {
       settings: {},
     });
     await game.save();
-    res.cookie("gameId", gameId, {
-      maxAge: oneHourInSeconds * 2,
-    });
-    res.cookie("userId", userId, {
-      maxAge: oneHourInSeconds * 2,
-    });
-
-    res.sendStatus(200);
+    res.send({ userId, gameId });
   } catch (e) {
     res.sendStatus(500);
   }
 });
 
-app.get("/api/games/:id", async (req, res) => {
+app.get("/api/games/:gameId", async (req, res) => {
   try {
-    const game = await Game.findOne({ id: req.params.id });
-    console.log(game);
-    if (game) {
-      res.cookie("gameId", game.id, {
-        maxAge: oneHourInSeconds * 2,
-      });
-      res.send(game);
-    } else {
-      res.sendStatus(500);
-    }
+    const game = await Game.findOne({ id: req.params.gameId });
+    game ? res.send(game) : res.sendStatus(500);
   } catch {
     res.sendStatus(500);
   }
 });
 
-app.put("/api/games/status", async (req, res) => {
+app.put("/api/games/status/:gameId", async (req, res) => {
   try {
-    const game = await Game.findOne({ id: req.cookies.gameId });
+    const game = await Game.findOne({ id: req.params.gameId });
     game.status = "started";
     await game.save();
     res.sendStatus(200);
@@ -73,14 +55,14 @@ app.get("/api/games", async (req, res) => {
   res.send(games);
 });
 
-app.post("/api/members", async (req, res) => {
+app.post("/api/members/:gameId", async (req, res) => {
+  const { member } = req.body;
   try {
-    const game = await Game.find({ id: req.cookies.gameId });
+    const game = await Game.findOne({ id: req.params.gameId });
     const userId = uuidv4();
-    game.members.push({ ...req.body.member, isOwner: false, id: userId });
+    game.members.push({ ...member, isOwner: false, id: userId });
     await game.save();
-    res.cookie("userId", userId);
-    res.sendStatus(200);
+    res.send({ userId });
   } catch {
     res.sendStatus(500);
   }
