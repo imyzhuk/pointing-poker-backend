@@ -12,13 +12,34 @@ const game = new Schema({
   members: {
     type: [
       {
-        id: String,
-        firstName: String,
-        lastName: String,
-        jobPosition: String,
-        imagePath: String,
-        isOwner: Boolean,
-        role: String,
+        id: {
+          type: String,
+          required: true,
+        },
+        firstName: {
+          type: String,
+          required: true,
+        },
+        lastName: {
+          type: String,
+          required: false,
+        },
+        jobPosition: {
+          type: String,
+          required: false,
+        },
+        imagePath: {
+          type: String,
+          default: "",
+        },
+        isOwner: {
+          type: Boolean,
+          required: true,
+        },
+        role: {
+          type: String,
+          required: true,
+        },
       },
     ],
   },
