@@ -9,6 +9,16 @@ const imageRoutes = require('./imageRoutes');
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+const httpServer = require("http").createServer(app);
+const options = { cors: {
+    origin: "http://localhost:3003",
+    methods: ["GET", "POST"]
+  } };
+const io = require('socket.io')(httpServer, options);
+io.on("connection", (socket) => {
+  socket.emit("hello", "world");
+});
+
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use(cors());
@@ -107,6 +117,7 @@ const start = async (server) => {
     server.listen(PORT, function() {
       console.log('Server listening on port %d in %s mode', this.address().port, app.settings.env);
     });
+    httpServer.listen(3011)
   } catch (error) {
     console.log(error);
   }
