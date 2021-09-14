@@ -27,9 +27,9 @@ io.on('connection', (socket) => {
     socket.join(room);
     console.log(`Room created: ${room}`);
   });
-  socket.on('memberConnected', (member) => {
-    console.log(member);
-  })
+  // socket.on('memberConnected', (member) => {
+  //   console.log(member);
+  // })
   socket.on('disconnect', function(socket) {
     console.log('User Disconnected');
   });
