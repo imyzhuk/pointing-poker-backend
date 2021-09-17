@@ -36,7 +36,7 @@ const game = new Schema({
           type: Boolean,
           required: true,
         },
-        role: {
+        userRole: {
           type: String,
           required: true,
         },
