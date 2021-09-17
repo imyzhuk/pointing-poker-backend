@@ -19,7 +19,7 @@ app.post("/api/games", async (req, res) => {
     const game = await new Game({
       id: gameId,
       status: "created",
-      members: [{ ...owner, role: "observer", isOwner: true, id: userId }],
+      members: [{ ...owner, userRole: "observer", isOwner: true, id: userId }],
       task: [],
       settings: {},
     });
