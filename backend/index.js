@@ -63,7 +63,8 @@ app.post("/api/members/:gameId", async (req, res) => {
     game.members.push({ ...member, isOwner: false, id: userId });
     await game.save();
     res.send({ userId });
-  } catch {
+  } catch (e) {
+    console.log(e);
     res.sendStatus(500);
   }
 });
