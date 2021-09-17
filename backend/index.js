@@ -1,27 +1,27 @@
-const express = require("express");
-const mongoose = require("mongoose");
-const cors = require("cors");
-const { v4: uuidv4 } = require("uuid");
+const express = require('express');
+const mongoose = require('mongoose');
+const cors = require('cors');
+const { v4: uuidv4 } = require('uuid');
 require('dotenv').config();
-const Game = require("./game");
+const Game = require('./game');
 const imageRoutes = require('./imageRoutes');
 
 const app = express();
 const port = process.env.PORT || 3001;
 
-app.use(express.json({ limit: "50mb" }));
-app.use(express.urlencoded({ limit: "50mb", extended: true }));
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use(cors());
 app.use('/api/upload', imageRoutes);
 
-app.post("/api/games", async (req, res) => {
+app.post('/api/games', async (req, res) => {
   try {
     const { owner } = req.body;
     const userId = uuidv4();
     const gameId = uuidv4();
     const game = await new Game({
       id: gameId,
-      status: "created",
+      status: 'created',
       members: [{ ...owner, isOwner: true, id: userId }],
       task: [],
       settings: {},
@@ -33,7 +33,7 @@ app.post("/api/games", async (req, res) => {
   }
 });
 
-app.get("/api/games/:gameId", async (req, res) => {
+app.get('/api/games/:gameId', async (req, res) => {
   try {
     const game = await Game.findOne({ id: req.params.gameId });
     game ? res.send(game) : res.sendStatus(500);
@@ -42,10 +42,10 @@ app.get("/api/games/:gameId", async (req, res) => {
   }
 });
 
-app.put("/api/games/status/:gameId", async (req, res) => {
+app.put('/api/games/status/:gameId', async (req, res) => {
   try {
     const game = await Game.findOne({ id: req.params.gameId });
-    game.status = "started";
+    game.status = 'started';
     await game.save();
     res.sendStatus(200);
   } catch {
@@ -53,12 +53,12 @@ app.put("/api/games/status/:gameId", async (req, res) => {
   }
 });
 
-app.get("/api/games", async (req, res) => {
+app.get('/api/games', async (req, res) => {
   const games = await Game.find({});
   res.send(games);
 });
 
-app.post("/api/members/:gameId", async (req, res) => {
+app.post('/api/members/:gameId', async (req, res) => {
   const { member } = req.body;
   try {
     const game = await Game.findOne({ id: req.params.gameId });
@@ -75,7 +75,7 @@ app.post("/api/members/:gameId", async (req, res) => {
 const start = async () => {
   try {
     await mongoose.connect(
-      "mongodb+srv://reactTeam:1q2w3e4r@poker.sh3rq.mongodb.net/poker",
+      'mongodb+srv://reactTeam:1q2w3e4r@poker.sh3rq.mongodb.net/poker',
       {
         useNewUrlParser: true,
         useFindAndModify: false,
@@ -84,7 +84,7 @@ const start = async () => {
     );
 
     app.listen(port, () => {
-      console.log("...Server started");
+      console.log('...Server started');
     });
   } catch (error) {
     console.log(error);

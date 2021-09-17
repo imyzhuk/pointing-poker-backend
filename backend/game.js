@@ -1,4 +1,4 @@
-const { Schema, model } = require("mongoose");
+const { Schema, model } = require('mongoose');
 
 const game = new Schema({
   id: {
@@ -30,7 +30,7 @@ const game = new Schema({
         },
         imagePath: {
           type: String,
-          default: "",
+          default: '',
         },
         isOwner: {
           type: Boolean,
@@ -47,4 +47,4 @@ const game = new Schema({
   tasks: [],
 });
 
-module.exports = model("Game", game);
+module.exports = model('Game', game);
