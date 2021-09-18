@@ -6,6 +6,7 @@ require("dotenv").config();
 const Game = require("./game");
 const imageRoutes = require("./imageRoutes");
 const issuesRoutes = require("./issuesRoutes");
+const memberRoutes = require("./memberRoutes");
 
 const app = express();
 const port = process.env.PORT || 3001;
@@ -15,6 +16,7 @@ app.use(express.urlencoded({ limit: "50mb", extended: true }));
 app.use(cors());
 app.use("/api/upload", imageRoutes);
 app.use("/api/issues", issuesRoutes);
+app.use("/api/members", memberRoutes);
 
 app.post("/api/games", async (req, res) => {
   try {
@@ -58,35 +60,6 @@ app.put("/api/games/status/:gameId", async (req, res) => {
 app.get("/api/games", async (req, res) => {
   const games = await Game.find({});
   res.send(games);
-});
-
-app.post("/api/members/:gameId", async (req, res) => {
-  const { member } = req.body;
-  try {
-    const game = await Game.findOne({ id: req.params.gameId });
-    const userId = uuidv4();
-    game.members.push({ ...member, isOwner: false, id: userId });
-    await game.save();
-    res.send({ userId });
-  } catch (e) {
-    console.log(e);
-    res.sendStatus(500);
-  }
-});
-
-app.delete("/api/members/:gameId/:userId", async (req, res) => {
-  try {
-    const game = await Game.findOne({ id: req.params.gameId });
-    const searchedMemberIndex = game.members.findIndex(
-      (member) => member.id === req.params.userId
-    );
-    game.members.splice(searchedMemberIndex, 1);
-    await game.save();
-    res.sendStatus(200);
-  } catch (e) {
-    console.log(e);
-    res.sendStatus(500);
-  }
 });
 
 const start = async () => {
