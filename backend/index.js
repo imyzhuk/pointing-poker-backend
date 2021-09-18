@@ -5,6 +5,8 @@ const { v4: uuidv4 } = require('uuid');
 require('dotenv').config();
 const Game = require('./game');
 const imageRoutes = require('./imageRoutes');
+const issuesRoutes = require('./issuesRoutes');
+const memberRoutes = require('./memberRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -13,6 +15,8 @@ app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use(cors());
 app.use('/api/upload', imageRoutes);
+app.use('/api/issues', issuesRoutes);
+app.use('/api/members', memberRoutes);
 
 
 const httpServer = require('http').createServer(app);
