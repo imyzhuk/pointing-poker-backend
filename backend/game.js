@@ -44,7 +44,29 @@ const game = new Schema({
     ],
   },
   settings: {},
-  tasks: [],
+  tasks: {
+    type: [
+      {
+        id: {
+          type: String,
+          required: true,
+        },
+        title: {
+          type: String,
+          required: true,
+        },
+        link: {
+          type: String,
+          required: false,
+        },
+        priority: {
+          type: String,
+          default: "low",
+        },
+      },
+    ],
+    default: [],
+  },
 });
 
 module.exports = model("Game", game);

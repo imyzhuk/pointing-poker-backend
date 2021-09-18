@@ -5,6 +5,7 @@ const { v4: uuidv4 } = require("uuid");
 require("dotenv").config();
 const Game = require("./game");
 const imageRoutes = require("./imageRoutes");
+const issuesRoutes = require("./issuesRoutes");
 
 const app = express();
 const port = process.env.PORT || 3001;
@@ -13,6 +14,7 @@ app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
 app.use(cors());
 app.use("/api/upload", imageRoutes);
+app.use("/api/issues", issuesRoutes);
 
 app.post("/api/games", async (req, res) => {
   try {
