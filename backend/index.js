@@ -2,9 +2,9 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const { v4: uuidv4 } = require("uuid");
-require('dotenv').config();
+require("dotenv").config();
 const Game = require("./game");
-const imageRoutes = require('./imageRoutes');
+const imageRoutes = require("./imageRoutes");
 
 const app = express();
 const port = process.env.PORT || 3001;
@@ -12,7 +12,7 @@ const port = process.env.PORT || 3001;
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
 app.use(cors());
-app.use('/api/upload', imageRoutes);
+app.use("/api/upload", imageRoutes);
 
 app.post("/api/games", async (req, res) => {
   try {
@@ -66,6 +66,21 @@ app.post("/api/members/:gameId", async (req, res) => {
     game.members.push({ ...member, isOwner: false, id: userId });
     await game.save();
     res.send({ userId });
+  } catch (e) {
+    console.log(e);
+    res.sendStatus(500);
+  }
+});
+
+app.delete("/api/members/:gameId/:userId", async (req, res) => {
+  try {
+    const game = await Game.findOne({ id: req.params.gameId });
+    const searchedMemberIndex = game.members.findIndex(
+      (member) => member.id === req.params.userId
+    );
+    game.members.splice(searchedMemberIndex, 1);
+    await game.save();
+    res.sendStatus(200);
   } catch (e) {
     console.log(e);
     res.sendStatus(500);
