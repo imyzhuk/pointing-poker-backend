@@ -5,8 +5,13 @@ const { v4: uuidv4 } = require('uuid');
 require('dotenv').config();
 const Game = require('./game');
 const imageRoutes = require('./imageRoutes');
+
+let io;
+const getIoInstance = () => {
+  return io
+}
 const issuesRoutes = require('./issuesRoutes');
-const memberRoutes = require('./memberRoutes');
+const memberRoutes = require('./memberRoutes')(getIoInstance);
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -25,16 +30,12 @@ const options = { cors: {
     methods: ['GET', 'POST', 'PUT', 'DELETE']
   } };
 const { Server } = require('socket.io');
-const io = new Server(httpServer, options);
+io = new Server(httpServer, options);
 io.on('connection', (socket) => {
   socket.on('create', function(room) {
     socket.join(room);
-    console.log(`Room created: ${room}`);
   });
-  // socket.on('memberConnected', (member) => {
-  //   console.log(member);
-  // })
-  socket.on('disconnect', function(socket) {
+    socket.on('disconnect', function() {
     console.log('User Disconnected');
   });
 });
@@ -81,21 +82,6 @@ app.put('/api/games/status/:gameId', async (req, res) => {
 app.get('/api/games', async (req, res) => {
   const games = await Game.find({});
   res.send(games);
-});
-
-app.post('/api/members/:gameId', async (req, res) => {
-  const { member } = req.body;
-  try {
-    const game = await Game.findOne({ id: req.params.gameId });
-    const userId = uuidv4();
-    game.members.push({ ...member, isOwner: false, id: userId });
-    await game.save();
-    res.send({ userId });
-    io.to(req.params.gameId).emit('memberConnected', game.members)
-  } catch (e) {
-    console.log(e);
-    res.sendStatus(500);
-  }
 });
 
 const start = async (server) => {
