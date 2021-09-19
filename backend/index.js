@@ -4,7 +4,9 @@ const cors = require('cors');
 const { v4: uuidv4 } = require('uuid');
 require('dotenv').config();
 const Game = require('./game');
+const Voting = require('./voting');
 const imageRoutes = require('./imageRoutes');
+const votesRoutes = require('./votesRoutes');
 
 let io;
 const getIoInstance = () => {
@@ -22,6 +24,7 @@ app.use(cors());
 app.use('/api/upload', imageRoutes);
 app.use('/api/issues', issuesRoutes);
 app.use('/api/members', memberRoutes);
+app.use('/api/votes', votesRoutes);
 
 
 const httpServer = require('http').createServer(app);
@@ -53,8 +56,13 @@ app.post('/api/games', async (req, res) => {
       settings: {},
     });
     await game.save();
+    const voting = await new Voting({
+      gameId,
+    });
+    await voting.save();
     res.send({ userId, gameId });
   } catch (e) {
+    console.log(e);
     res.sendStatus(500);
   }
 });
