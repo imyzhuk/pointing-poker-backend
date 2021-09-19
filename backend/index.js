@@ -68,10 +68,10 @@ app.get('/api/games/:gameId', async (req, res) => {
   }
 });
 
-app.put('/api/games/status/:gameId', async (req, res) => {
+app.put('/api/status/:gameId', async (req, res) => {
   try {
     const game = await Game.findOne({ id: req.params.gameId });
-    game.status = 'started';
+    game.status = req.body.status;
     await game.save();
     res.sendStatus(200);
   } catch {
