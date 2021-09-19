@@ -1,4 +1,4 @@
-const express = require('express');
+ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const { v4: uuidv4 } = require('uuid');
@@ -12,7 +12,7 @@ let io;
 const getIoInstance = () => {
   return io
 }
-const issuesRoutes = require('./issuesRoutes');
+const issuesRoutes = require('./issuesRoutes')(getIoInstance);
 const memberRoutes = require('./memberRoutes')(getIoInstance);
 
 const app = express();
