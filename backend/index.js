@@ -2,9 +2,11 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const { v4: uuidv4 } = require("uuid");
-require('dotenv').config();
+require("dotenv").config();
 const Game = require("./game");
-const imageRoutes = require('./imageRoutes');
+const Voting = require("./voting");
+const imageRoutes = require("./imageRoutes");
+const votesRoutes = require("./votesRoutes");
 
 const app = express();
 const port = process.env.PORT || 3001;
@@ -12,7 +14,8 @@ const port = process.env.PORT || 3001;
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
 app.use(cors());
-app.use('/api/upload', imageRoutes);
+app.use("/api/upload", imageRoutes);
+app.use("/api/votes", votesRoutes);
 
 app.post("/api/games", async (req, res) => {
   try {
@@ -27,8 +30,13 @@ app.post("/api/games", async (req, res) => {
       settings: {},
     });
     await game.save();
+    const voting = await new Voting({
+      gameId,
+    });
+    await voting.save();
     res.send({ userId, gameId });
   } catch (e) {
+    console.log(e);
     res.sendStatus(500);
   }
 });
