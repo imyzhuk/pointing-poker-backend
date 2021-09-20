@@ -81,6 +81,7 @@ app.put('/api/status/:gameId', async (req, res) => {
     const game = await Game.findOne({ id: req.params.gameId });
     game.status = req.body.status;
     await game.save();
+    getIoInstance().to(req.params.gameId).emit('gameStatusChange', game.status);
     res.sendStatus(200);
   } catch {
     res.sendStatus(500);
