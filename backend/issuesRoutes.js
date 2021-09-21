@@ -1,6 +1,5 @@
 const express = require("express");
 const router = express.Router();
-const { v4: uuidv4 } = require("uuid");
 const Game = require("./game");
 
 module.exports = function(getIoInstance) {
@@ -66,6 +65,22 @@ module.exports = function(getIoInstance) {
       game.tasks.splice(searchedTaskIndex, 1);
       await game.save();
       getIoInstance().to(req.params.gameId).emit('tasksChange', game.tasks);
+      res.sendStatus(200);
+    } catch (e) {
+      console.log(e);
+      res.sendStatus(500);
+    }
+  });
+
+  router.put("/:gameId/current/:taskId", async (req, res) => {
+    try {
+      const game = await Game.findOne({ id: req.params.gameId });
+      let searchedTask = game.tasks.find((task) => task.id === req.params.taskId);
+      if (!searchedTask)
+        res.sendStatus(500);
+      game.currentTaskId = req.params.taskId;
+      await game.save();
+      getIoInstance().to(req.params.gameId).emit('currentTaskChange', game.currentTaskId);
       res.sendStatus(200);
     } catch (e) {
       console.log(e);
