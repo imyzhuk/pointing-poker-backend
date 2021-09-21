@@ -67,6 +67,10 @@ const game = new Schema({
     ],
     default: [],
   },
+  currentTaskId: {
+    type: String,
+    required: false,
+  }
 });
 
 module.exports = model('Game', game);
