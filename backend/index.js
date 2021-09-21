@@ -38,9 +38,9 @@ io.on('connection', (socket) => {
   socket.on('create', function(room) {
     socket.join(room);
   });
-    socket.on('disconnect', function() {
-    console.log('User Disconnected');
-  });
+  //   socket.on('disconnect', function() {
+  //     console.log('User Disconnected');
+  // });
 });
 
 app.post('/api/games', async (req, res) => {
@@ -92,6 +92,12 @@ app.get('/api/games', async (req, res) => {
   const games = await Game.find({});
   res.send(games);
 });
+
+app.post('/api/timer/:gameId', (req, res) => {
+  console.log('started');
+  getIoInstance().to(req.params.gameId).emit('timerStatus', 'started');
+  res.sendStatus(200);
+})
 
 const start = async (server) => {
   try {
