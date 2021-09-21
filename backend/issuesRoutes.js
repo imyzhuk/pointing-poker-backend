@@ -3,7 +3,7 @@ const router = express.Router();
 const { v4: uuidv4 } = require("uuid");
 const Game = require("./game");
 
-module.exports = function (getIoInstance){
+module.exports = function(getIoInstance) {
   router.get("/:gameId", async (req, res) => {
     try {
       const game = await Game.findOne({ id: req.params.gameId });
@@ -31,11 +31,10 @@ module.exports = function (getIoInstance){
     const { task } = req.body;
     try {
       const game = await Game.findOne({ id: req.params.gameId });
-      const taskId = uuidv4();
-      game.tasks.push({ ...task, id: taskId });
+      game.tasks.push(task);
       await game.save();
       getIoInstance().to(req.params.gameId).emit('tasksChange', game.tasks);
-      res.send({ taskId });
+      res.send({ taskId: task.id });
     } catch (e) {
       console.log(e);
       res.sendStatus(500);
@@ -47,12 +46,8 @@ module.exports = function (getIoInstance){
     try {
       const game = await Game.findOne({ id: req.params.gameId });
       let searchedTask = game.tasks.find((task) => task.id === req.params.taskId);
-      searchedTask = { ...searchedTask.toObject(), ...task };
-      const searchedTaskIndex = game.tasks.findIndex(
-        (task) => task.id === req.params.taskId
-      );
+      searchedTask.title = task.title;
 
-      game.tasks[searchedTaskIndex] = searchedTask;
       await game.save();
       getIoInstance().to(req.params.gameId).emit('tasksChange', game.tasks);
       res.sendStatus(200);
