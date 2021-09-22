@@ -8,12 +8,14 @@ const Voting = require('./voting');
 const imageRoutes = require('./imageRoutes');
 const votesRoutes = require('./votesRoutes');
 
+
 let io;
 const getIoInstance = () => {
   return io
 }
 const issuesRoutes = require('./issuesRoutes')(getIoInstance);
 const memberRoutes = require('./memberRoutes')(getIoInstance);
+const gameRound = require('./timer')(getIoInstance);
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -25,6 +27,7 @@ app.use('/api/upload', imageRoutes);
 app.use('/api/issues', issuesRoutes);
 app.use('/api/members', memberRoutes);
 app.use('/api/votes', votesRoutes);
+app.use('/api/round', gameRound);
 
 
 const httpServer = require('http').createServer(app);
@@ -38,9 +41,9 @@ io.on('connection', (socket) => {
   socket.on('create', function(room) {
     socket.join(room);
   });
-    socket.on('disconnect', function() {
-    console.log('User Disconnected');
-  });
+  //   socket.on('disconnect', function() {
+  //   console.log('User Disconnected');
+  // });
 });
 
 app.post('/api/games', async (req, res) => {
