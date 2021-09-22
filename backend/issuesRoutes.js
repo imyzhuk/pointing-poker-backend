@@ -34,7 +34,10 @@ module.exports = function (getIoInstance){
       const taskId = uuidv4();
       game.tasks.push({ ...task, id: taskId });
       await game.save();
+      console.log('issue create ', taskId , Date.now());
       getIoInstance().to(req.params.gameId).emit('tasksChange', game.tasks);
+
+
       res.send({ taskId });
     } catch (e) {
       console.log(e);
@@ -54,6 +57,7 @@ module.exports = function (getIoInstance){
 
       game.tasks[searchedTaskIndex] = searchedTask;
       await game.save();
+      console.log('issue update ', req.params.taskId , Date.now());
       getIoInstance().to(req.params.gameId).emit('tasksChange', game.tasks);
       res.sendStatus(200);
     } catch (e) {
@@ -70,6 +74,7 @@ module.exports = function (getIoInstance){
       );
       game.tasks.splice(searchedTaskIndex, 1);
       await game.save();
+      console.log('issue delete ', req.params.taskId , Date.now());
       getIoInstance().to(req.params.gameId).emit('tasksChange', game.tasks);
       res.sendStatus(200);
     } catch (e) {

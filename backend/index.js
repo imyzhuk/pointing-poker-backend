@@ -35,8 +35,13 @@ const options = { cors: {
 const { Server } = require('socket.io');
 io = new Server(httpServer, options);
 io.on('connection', (socket) => {
-  socket.on('create', function(room) {
+  socket.on('joinGameRoom', function(room) {
+    console.log(`socket ${socket.id} joined room ${room}`);
     socket.join(room);
+  });
+  socket.on('leaveGameRoom', function(room) {
+    console.log(`socket ${socket.id} left room ${room}`);
+    socket.leave(room);
   });
   //   socket.on('disconnect', function() {
   //     console.log('User Disconnected');
