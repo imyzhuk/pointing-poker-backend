@@ -29,9 +29,27 @@ module.exports = function(getIoInstance) {
     }
   });
 
+  router.delete('/:gameId/:playerId', async (req, res) => {
+    const { gameId, playerId } = req.params;
+    try {
+      const voting = await Voting.findOne({ gameId });
+
+      voting.tasks.forEach(task => {
+        task.score = task.score.filter(score => score.playerId !== playerId)
+      })
+
+      await voting.save();
+      res.sendStatus(200);
+    } catch (e) {
+      console.log(e);
+      res.sendStatus(500);
+    }
+  });
+
   router.get('/:gameId', async (req, res) => {
     try {
       const voting = await Voting.findOne({ gameId: req.params.gameId });
+      getIoInstance().to(req.params.gameId).emit('roundResultChange', voting.tasks);
       res.send(voting.tasks);
     } catch (e) {
       console.log(e);
@@ -46,7 +64,6 @@ module.exports = function(getIoInstance) {
         (task) => task.taskId === req.params.taskId
       );
 
-      getIoInstance().to(req.params.gameId).emit('roundResultChange', votesByDefiniteTask);
       res.send(votesByDefiniteTask);
     } catch (e) {
       console.log(e);
