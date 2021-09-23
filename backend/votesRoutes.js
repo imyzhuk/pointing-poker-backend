@@ -1,61 +1,58 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router();
-const { v4: uuidv4 } = require("uuid");
-const Voting = require("./voting");
+const Voting = require('./voting');
 
-router.post("/:gameId", async (req, res) => {
-  const { vote } = req.body;
-  try {
-    const voting = await Voting.findOne({ gameId: req.params.gameId });
-    voting.votes.push(vote);
-    await voting.save();
+module.exports = function(getIoInstance) {
+  router.post('/:gameId', async (req, res) => {
+    const { playerId, taskId, card } = req.body;
+    try {
+      const voting = await Voting.findOne({ gameId: req.params.gameId });
+      const vote = { playerId, card };
+      const existingTask = voting.tasks.find(task => task.taskId === taskId);
 
-    res.sendStatus(200);
-  } catch (e) {
-    console.log(e);
-    res.sendStatus(500);
-  }
-});
+      if (existingTask) {
+        const playerVote = existingTask.score.find(task => task.playerId === playerId);
 
-router.put("/:gameId", async (req, res) => {
-  const {
-    vote: { userId, taskId, mark },
-  } = req.body;
-  try {
-    const voting = await Voting.findOne({ gameId: req.params.gameId });
-    const searchedVote = voting.votes.find(
-      (vote) => vote.userId === userId && vote.taskId === taskId
-    );
+        if (playerVote) playerVote.card = card;
+        else existingTask.score.push(vote);
+      } else {
+        voting.tasks.push({
+          taskId, score: vote
+        });
+      }
 
-    searchedVote["mark"] = mark;
-    await voting.save();
-    res.sendStatus(200);
-  } catch (e) {
-    console.log(e);
-    res.sendStatus(500);
-  }
-});
+      await voting.save();
+      res.sendStatus(200);
+    } catch (e) {
+      console.log(e);
+      res.sendStatus(500);
+    }
+  });
 
-router.get("/:gameId", async (req, res) => {
-  try {
-    const voting = await Voting.findOne({ gameId: req.params.gameId });
-    res.send(voting.votes);
-  } catch (e) {
-    console.log(e);
-    res.sendStatus(500);
-  }
-});
-router.get("/:gameId/tasks/:taskId", async (req, res) => {
-  try {
-    const voting = await Voting.findOne({ gameId: req.params.gameId });
-    const votesByDefiniteTask = voting.votes.filter(
-      (vote) => vote.taskId === req.params.taskId
-    );
-    res.send(votesByDefiniteTask);
-  } catch (e) {
-    console.log(e);
-    res.sendStatus(500);
-  }
-});
+  router.get('/:gameId', async (req, res) => {
+    try {
+      const voting = await Voting.findOne({ gameId: req.params.gameId });
+      res.send(voting.tasks);
+    } catch (e) {
+      console.log(e);
+      res.sendStatus(500);
+    }
+  });
 
-module.exports = router;
+  router.get('/:gameId/tasks/:taskId', async (req, res) => {
+    try {
+      const voting = await Voting.findOne({ gameId: req.params.gameId });
+      const votesByDefiniteTask = voting.tasks.find(
+        (task) => task.taskId === req.params.taskId
+      );
+
+      getIoInstance().to(req.params.gameId).emit('roundResultChange', votesByDefiniteTask);
+      res.send(votesByDefiniteTask);
+    } catch (e) {
+      console.log(e);
+      res.sendStatus(500);
+    }
+  });
+
+  return router;
+};
