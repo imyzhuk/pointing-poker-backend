@@ -70,6 +70,11 @@ const game = new Schema({
   currentTaskId: {
     type: String,
     required: false,
+  },
+  roundStatus: {
+    type: String,
+    default:'pending'
+
   }
 });
 
