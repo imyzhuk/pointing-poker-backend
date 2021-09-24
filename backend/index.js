@@ -4,18 +4,19 @@ const cors = require('cors');
 const { v4: uuidv4 } = require('uuid');
 require('dotenv').config();
 const Game = require('./game');
-const Voting = require('./voting');
-const imageRoutes = require('./imageRoutes');
 
 
 let io;
 const getIoInstance = () => {
   return io
 }
+
 const issuesRoutes = require('./issuesRoutes')(getIoInstance);
 const memberRoutes = require('./memberRoutes')(getIoInstance);
 const gameRound = require('./timer')(getIoInstance);
 const votesRoutes = require('./votesRoutes')(getIoInstance);
+const imageRoutes = require('./imageRoutes');
+
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -61,10 +62,6 @@ app.post('/api/games', async (req, res) => {
       settings: {},
     });
     await game.save();
-    const voting = await new Voting({
-      gameId,
-    });
-    await voting.save();
     res.send({ userId, gameId });
   } catch (e) {
     console.log(e);

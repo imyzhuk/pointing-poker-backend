@@ -1,6 +1,33 @@
 const { Schema, model } = require('mongoose');
 
-const game = new Schema({
+const cardSchema = new Schema({
+  value: {
+    type: String,
+    required: true
+  },
+  imagePath: {
+    type: String,
+    required: false
+  }
+})
+
+const scoreSchema = new Schema({
+  playerId: {
+    type: String,
+    required: true,
+  },
+  card: cardSchema
+})
+
+const voteSchema = new Schema({
+  taskId: {
+    type: String,
+    required: true,
+  },
+  score: [scoreSchema]
+})
+
+const gameSchema = new Schema({
   id: {
     type: String,
     required: true,
@@ -73,9 +100,9 @@ const game = new Schema({
   },
   roundStatus: {
     type: String,
-    default:'pending'
-
-  }
+    default: 'pending'
+  },
+  votes: [voteSchema || []]
 });
 
-module.exports = model('Game', game);
+module.exports = model('Game', gameSchema);
