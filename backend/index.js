@@ -1,21 +1,22 @@
- const express = require('express');
+const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const { v4: uuidv4 } = require('uuid');
 require('dotenv').config();
 const Game = require('./game');
-const Voting = require('./voting');
-const imageRoutes = require('./imageRoutes');
-const votesRoutes = require('./votesRoutes');
 
 
 let io;
 const getIoInstance = () => {
   return io
 }
+
 const issuesRoutes = require('./issuesRoutes')(getIoInstance);
 const memberRoutes = require('./memberRoutes')(getIoInstance);
 const gameRound = require('./timer')(getIoInstance);
+const votesRoutes = require('./votesRoutes')(getIoInstance);
+const imageRoutes = require('./imageRoutes');
+
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -31,10 +32,12 @@ app.use('/api/round', gameRound);
 
 
 const httpServer = require('http').createServer(app);
-const options = { cors: {
+const options = {
+  cors: {
     origins: '*',
     methods: ['GET', 'POST', 'PUT', 'DELETE']
-  } };
+  }
+};
 const { Server } = require('socket.io');
 io = new Server(httpServer, options);
 io.on('connection', (socket) => {
@@ -59,10 +62,6 @@ app.post('/api/games', async (req, res) => {
       settings: {},
     });
     await game.save();
-    const voting = await new Voting({
-      gameId,
-    });
-    await voting.save();
     res.send({ userId, gameId });
   } catch (e) {
     console.log(e);
