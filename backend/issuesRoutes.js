@@ -1,9 +1,9 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router();
-const Game = require("./game");
+const Game = require('./game');
 
 module.exports = function(getIoInstance) {
-  router.get("/:gameId", async (req, res) => {
+  router.get('/:gameId', async (req, res) => {
     try {
       const game = await Game.findOne({ id: req.params.gameId });
       res.send(game.tasks);
@@ -13,7 +13,7 @@ module.exports = function(getIoInstance) {
     }
   });
 
-  router.get("/:gameId/:taskId", async (req, res) => {
+  router.get('/:gameId/:taskId', async (req, res) => {
     try {
       const game = await Game.findOne({ id: req.params.gameId });
       const searchedTask = game.tasks.find(
@@ -26,7 +26,7 @@ module.exports = function(getIoInstance) {
     }
   });
 
-  router.post("/:gameId", async (req, res) => {
+  router.post('/:gameId', async (req, res) => {
     const { task } = req.body;
     try {
       const game = await Game.findOne({ id: req.params.gameId });
@@ -40,12 +40,14 @@ module.exports = function(getIoInstance) {
     }
   });
 
-  router.put("/:gameId/:taskId", async (req, res) => {
+  router.put('/:gameId/:taskId', async (req, res) => {
     const { task } = req.body;
     try {
       const game = await Game.findOne({ id: req.params.gameId });
-      let searchedTask = game.tasks.find((task) => task.id === req.params.taskId);
-      searchedTask.title = task.title;
+      const searchedTaskIndex = game.tasks.findIndex(
+        (task) => task.id === req.params.taskId
+      );
+      game.tasks.splice(searchedTaskIndex, 1, task);
 
       await game.save();
       getIoInstance().to(req.params.gameId).emit('tasksChange', game.tasks);
@@ -56,7 +58,7 @@ module.exports = function(getIoInstance) {
     }
   });
 
-  router.delete("/:gameId/:taskId", async (req, res) => {
+  router.delete('/:gameId/:taskId', async (req, res) => {
     try {
       const game = await Game.findOne({ id: req.params.gameId });
       const searchedTaskIndex = game.tasks.findIndex(
@@ -72,7 +74,7 @@ module.exports = function(getIoInstance) {
     }
   });
 
-  router.put("/:gameId/current/:taskId", async (req, res) => {
+  router.put('/:gameId/current/:taskId', async (req, res) => {
     try {
       const game = await Game.findOne({ id: req.params.gameId });
       let searchedTask = game.tasks.find((task) => task.id === req.params.taskId);
