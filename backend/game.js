@@ -1,4 +1,4 @@
-const { Schema, model } = require('mongoose');
+const { Schema, model } = require("mongoose");
 
 const game = new Schema({
   id: {
@@ -30,7 +30,7 @@ const game = new Schema({
         },
         imagePath: {
           type: String,
-          default: '',
+          default: "",
         },
         isOwner: {
           type: Boolean,
@@ -43,7 +43,39 @@ const game = new Schema({
       },
     ],
   },
-  settings: {},
+  settings: {
+    type: {
+      isChangingCardInRoundEnd: {
+        type: Boolean,
+        default: false,
+      },
+      cardsSet: {
+        type: String,
+        default: "fibonacci",
+      },
+      ownCardsSet: {
+        type: [{ value: Number, id: String }],
+        default: [],
+      },
+      isAutoEnteringPlayers: {
+        type: Boolean,
+        default: false,
+      },
+      isAutoReversingCardsAfterVoting: {
+        type: Boolean,
+        default: false,
+      },
+      isTimerNeeded: {
+        type: Boolean,
+        default: false,
+      },
+      roundTime: {
+        type: Number,
+        required: false,
+      },
+    },
+    default: {},
+  },
   tasks: {
     type: [
       {
@@ -61,7 +93,7 @@ const game = new Schema({
         },
         priority: {
           type: String,
-          default: 'low',
+          default: "low",
         },
       },
     ],
@@ -73,9 +105,8 @@ const game = new Schema({
   },
   roundStatus: {
     type: String,
-    default:'pending'
-
-  }
+    default: "pending",
+  },
 });
 
-module.exports = model('Game', game);
+module.exports = model("Game", game);
