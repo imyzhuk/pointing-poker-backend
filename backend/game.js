@@ -3,29 +3,29 @@ const { Schema, model } = require('mongoose');
 const cardSchema = new Schema({
   value: {
     type: String,
-    required: true
+    required: true,
   },
   imagePath: {
     type: String,
-    required: false
-  }
-})
+    required: false,
+  },
+});
 
 const scoreSchema = new Schema({
   playerId: {
     type: String,
     required: true,
   },
-  card: cardSchema
-})
+  card: cardSchema,
+});
 
 const voteSchema = new Schema({
   taskId: {
     type: String,
     required: true,
   },
-  score: [scoreSchema]
-})
+  score: [scoreSchema],
+});
 
 const gameSchema = new Schema({
   id: {
@@ -100,9 +100,24 @@ const gameSchema = new Schema({
   },
   roundStatus: {
     type: String,
-    default: 'pending'
+    default: 'pending',
   },
-  votes: [voteSchema || []]
+  votes: [voteSchema || []],
+  chat: {
+    type: [
+      {
+        userId: {
+          type: String,
+          required: true,
+        },
+        text: {
+          type: String,
+          required: true,
+        },
+      },
+    ],
+    default: [],
+  },
 });
 
 module.exports = model('Game', gameSchema);

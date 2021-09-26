@@ -5,18 +5,17 @@ const { v4: uuidv4 } = require('uuid');
 require('dotenv').config();
 const Game = require('./game');
 
-
 let io;
 const getIoInstance = () => {
-  return io
-}
+  return io;
+};
 
 const issuesRoutes = require('./issuesRoutes')(getIoInstance);
 const memberRoutes = require('./memberRoutes')(getIoInstance);
 const gameRound = require('./timer')(getIoInstance);
 const votesRoutes = require('./votesRoutes')(getIoInstance);
+const chatRoutes = require('./chatRoutes')(getIoInstance);
 const imageRoutes = require('./imageRoutes');
-
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -29,19 +28,19 @@ app.use('/api/issues', issuesRoutes);
 app.use('/api/members', memberRoutes);
 app.use('/api/votes', votesRoutes);
 app.use('/api/round', gameRound);
-
+app.use('/api/chat', chatRoutes);
 
 const httpServer = require('http').createServer(app);
 const options = {
   cors: {
     origins: '*',
-    methods: ['GET', 'POST', 'PUT', 'DELETE']
-  }
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  },
 };
 const { Server } = require('socket.io');
 io = new Server(httpServer, options);
 io.on('connection', (socket) => {
-  socket.on('create', function(room) {
+  socket.on('create', function (room) {
     socket.join(room);
   });
   //   socket.on('disconnect', function() {
@@ -105,12 +104,16 @@ const start = async (server) => {
         useUnifiedTopology: true,
       }
     );
-    server.listen(PORT, function() {
-      console.log('Server listening on port %d in %s mode', this.address().port, app.settings.env);
+    server.listen(PORT, function () {
+      console.log(
+        'Server listening on port %d in %s mode',
+        this.address().port,
+        app.settings.env
+      );
     });
   } catch (error) {
     console.log(error);
   }
-}
+};
 
 start(httpServer);
