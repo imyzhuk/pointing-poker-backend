@@ -59,14 +59,22 @@ module.exports = function(getIoInstance) {
   });
 
   router.delete('/:gameId/:taskId', async (req, res) => {
+    const { gameId, taskId } = req.params;
     try {
+      await Game.findOneAndUpdate(
+        { id: gameId },
+        {
+          $pull: {
+            "votes": { taskId },
+            "tasks": { id: taskId },
+          },
+        },
+        { multi: true }
+      )
+
       const game = await Game.findOne({ id: req.params.gameId });
-      const searchedTaskIndex = game.tasks.findIndex(
-        (task) => task.id === req.params.taskId
-      );
-      game.tasks.splice(searchedTaskIndex, 1);
-      await game.save();
       getIoInstance().to(req.params.gameId).emit('tasksChange', game.tasks);
+      getIoInstance().to(req.params.gameId).emit('votesChange', game.votes);
       res.sendStatus(200);
     } catch (e) {
       console.log(e);
@@ -77,9 +85,6 @@ module.exports = function(getIoInstance) {
   router.put('/:gameId/current/:taskId', async (req, res) => {
     try {
       const game = await Game.findOne({ id: req.params.gameId });
-      let searchedTask = game.tasks.find((task) => task.id === req.params.taskId);
-      if (!searchedTask)
-        res.sendStatus(500);
       game.currentTaskId = req.params.taskId;
       await game.save();
       getIoInstance().to(req.params.gameId).emit('currentTaskChange', game.currentTaskId);
