@@ -24,8 +24,26 @@ const voteSchema = new Schema({
     type: String,
     required: true,
   },
-  score: [scoreSchema],
+  score: [ scoreSchema ],
 });
+
+const kickVoteSchema = new Schema({
+    playerId:
+      {
+        type: String,
+        required: true,
+      },
+    action:
+      {
+        type: String,
+        required: true,
+      },
+    vote: {
+      type: Boolean,
+      default: true
+    },
+  }
+)
 
 const gameSchema = new Schema({
   id: {
@@ -102,7 +120,7 @@ const gameSchema = new Schema({
     type: String,
     default: 'pending',
   },
-  votes: [voteSchema || []],
+  votes: [ voteSchema || [] ],
   chat: {
     type: [
       {
@@ -118,6 +136,7 @@ const gameSchema = new Schema({
     ],
     default: [],
   },
+  kickVotes: [kickVoteSchema || []],
 });
 
 module.exports = model('Game', gameSchema);

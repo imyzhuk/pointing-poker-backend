@@ -15,6 +15,7 @@ const memberRoutes = require('./memberRoutes')(getIoInstance);
 const gameRound = require('./timer')(getIoInstance);
 const votesRoutes = require('./votesRoutes')(getIoInstance);
 const chatRoutes = require('./chatRoutes')(getIoInstance);
+const kickByVotesRoutes = require('./kickByVotesRoutes')(getIoInstance);
 const imageRoutes = require('./imageRoutes');
 
 const app = express();
@@ -29,6 +30,7 @@ app.use('/api/members', memberRoutes);
 app.use('/api/votes', votesRoutes);
 app.use('/api/round', gameRound);
 app.use('/api/chat', chatRoutes);
+app.use('/api/kick', kickByVotesRoutes);
 
 const httpServer = require('http').createServer(app);
 const options = {
