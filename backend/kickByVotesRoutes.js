@@ -7,7 +7,7 @@ module.exports = function (getIoInstance) {
     const { playerToKickId, kickProposeById, action, vote } = req.body;
     try {
       const game = await Game.findOne({ id: req.params.gameId });
-      if (!game.kickVotes.find( el => playerToKickId === el.playerId ) && action !== 'start kicking'){
+      if (action !== 'start kicking' && !game.kickVotes.find( el => playerToKickId === el.playerId )){
         console.log('this vote was finished', playerToKickId)
         res.sendStatus(200)
         return
@@ -25,13 +25,17 @@ module.exports = function (getIoInstance) {
         console.log(yes, no, memberNeeded)
         if ( yes >= memberNeeded ) {
           const memberToKick = game.members.findIndex(
-            (member) => member.id === req.params.userId
+            (member) => member.id === playerToKickId
           );
           game.members.splice(memberToKick, 1);
           getIoInstance().to(req.params.gameId).emit('membersChange', game.members);
         }
-        if (yes >= memberNeeded || no >= memberNeeded || yes + no === game.members.length){
-          game.kickVotes = game.kickVotes.filter((el) => el.playerId === playerToKickId)
+        console.log((yes >= memberNeeded) , (no >= memberNeeded) , (yes + no === game.members.length));
+        if ((yes >= memberNeeded) || (no >= memberNeeded) || (yes + no === game.members.length)){
+          console.log(game.kickVotes.length);
+          console.log(game.kickVotes.map(v => `${v.playerId} - ${v.vote}`));
+          game.kickVotes = game.kickVotes.filter((el) => el.playerId !== playerToKickId);
+          console.log(game.kickVotes.length);
         }
       }
       await game.save();
