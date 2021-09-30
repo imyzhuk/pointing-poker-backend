@@ -4,18 +4,19 @@ const cors = require('cors');
 const { v4: uuidv4 } = require('uuid');
 require('dotenv').config();
 const Game = require('./game');
-const Voting = require('./voting');
-const imageRoutes = require('./imageRoutes');
-const votesRoutes = require('./votesRoutes');
 
 let io;
 const getIoInstance = () => {
   return io;
 };
+
 const issuesRoutes = require('./issuesRoutes')(getIoInstance);
 const memberRoutes = require('./memberRoutes')(getIoInstance);
 const settingsRoutes = require('./settingsRoutes')(getIoInstance);
 const gameRound = require('./timer')(getIoInstance);
+const votesRoutes = require('./votesRoutes')(getIoInstance);
+const chatRoutes = require('./chatRoutes')(getIoInstance);
+const imageRoutes = require('./imageRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -29,6 +30,7 @@ app.use('/api/members', memberRoutes);
 app.use('/api/votes', votesRoutes);
 app.use('/api/round', gameRound);
 app.use('/api/settings', settingsRoutes);
+app.use('/api/chat', chatRoutes);
 
 const httpServer = require('http').createServer(app);
 const options = {
@@ -63,10 +65,6 @@ app.post('/api/games', async (req, res) => {
       settings: {},
     });
     await game.save();
-    const voting = await new Voting({
-      gameId,
-    });
-    await voting.save();
     res.send({ userId, gameId });
   } catch (e) {
     console.log(e);
