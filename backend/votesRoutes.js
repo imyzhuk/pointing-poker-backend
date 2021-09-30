@@ -23,6 +23,7 @@ module.exports = function(getIoInstance) {
 
       await game.save();
       getIoInstance().to(req.params.gameId).emit('roundResultChange', task);
+      getIoInstance().to(req.params.gameId).emit('votesChange', game.votes);
       res.sendStatus(200);
     } catch (e) {
       console.log(e);
