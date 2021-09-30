@@ -12,6 +12,7 @@ const getIoInstance = () => {
 
 const issuesRoutes = require('./issuesRoutes')(getIoInstance);
 const memberRoutes = require('./memberRoutes')(getIoInstance);
+const settingsRoutes = require('./settingsRoutes')(getIoInstance);
 const gameRound = require('./timer')(getIoInstance);
 const votesRoutes = require('./votesRoutes')(getIoInstance);
 const chatRoutes = require('./chatRoutes')(getIoInstance);
@@ -28,6 +29,7 @@ app.use('/api/issues', issuesRoutes);
 app.use('/api/members', memberRoutes);
 app.use('/api/votes', votesRoutes);
 app.use('/api/round', gameRound);
+app.use('/api/settings', settingsRoutes);
 app.use('/api/chat', chatRoutes);
 
 const httpServer = require('http').createServer(app);
@@ -56,7 +58,9 @@ app.post('/api/games', async (req, res) => {
     const game = await new Game({
       id: gameId,
       status: 'created',
-      members: [{ ...owner, isOwner: true, id: userId }],
+      members: [
+        { ...owner, isOwner: true, id: userId, userStatus: 'admitted' },
+      ],
       task: [],
       settings: {},
     });

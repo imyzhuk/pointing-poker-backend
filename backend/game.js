@@ -67,10 +67,42 @@ const gameSchema = new Schema({
           type: String,
           required: true,
         },
+        userStatus: {
+          type: String,
+          required: true,
+        },
       },
     ],
   },
-  settings: {},
+  settings: {
+    type: {
+      isChangingCardInRoundEnd: {
+        type: Boolean,
+        default: false,
+      },
+      cardsSet: {
+        type: String,
+        default: 'fibonacci',
+      },
+      ownCardsSet: {
+        type: [{ value: Number, id: String }],
+        default: [],
+      },
+      isAutoEnteringPlayers: {
+        type: Boolean,
+        default: false,
+      },
+      isTimerNeeded: {
+        type: Boolean,
+        default: false,
+      },
+      roundTime: {
+        type: Number,
+        required: false,
+      },
+    },
+    default: {},
+  },
   tasks: {
     type: [
       {
