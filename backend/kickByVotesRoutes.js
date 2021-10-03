@@ -12,6 +12,9 @@ module.exports = function (getIoInstance) {
         res.sendStatus(200)
         return
       }
+      if (action === 'start kicking'){
+        game.kickVotes = game.kickVotes.filter((el) => el.playerId !== playerToKickId);
+      }
       game.kickVotes.push(
         { playerId: playerToKickId, action, vote }
       )
