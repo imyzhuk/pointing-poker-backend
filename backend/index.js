@@ -47,9 +47,9 @@ io.on('connection', (socket) => {
   socket.on('create', function (room) {
     socket.join(room);
   });
-  //   socket.on('disconnect', function() {
-  //   console.log('User Disconnected');
-  // });
+   socket.on('disconnect', function() {
+     console.log('User Disconnected');
+   });
 });
 
 app.post('/api/games', async (req, res) => {
